@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
 from datetime import datetime, timezone
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.db.session import get_db
 from app.models.models import SecurityEvent, SecurityEventType
@@ -39,8 +39,7 @@ class SecurityEventResponse(BaseModel):
     notified: bool
     notes: Optional[str]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SecurityEventUpdate(BaseModel):

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Header
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from pydantic import BaseModel
 from typing import Set, Tuple, Annotated, Optional
 
@@ -22,8 +22,12 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 _TOKEN_BLACKLIST: Set[Tuple[str, datetime]] = set()
 
 
+def _now_utc() -> datetime:
+    return datetime.now(timezone.utc)
+
+
 def _blacklist_cleanup():
-    now = datetime.utcnow()
+    now = _now_utc()
     expired = {t for t in _TOKEN_BLACKLIST if t[1] <= now}
     for e in expired:
         _TOKEN_BLACKLIST.discard(e)
@@ -107,7 +111,7 @@ def logout(
     if authorization and authorization.lower().startswith("bearer "):
         raw_token = authorization.split(" ", 1)[1].strip()
 
-    exp_dt = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    exp_dt = _now_utc() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     if raw_token:
         _TOKEN_BLACKLIST.add((raw_token, exp_dt))
     _blacklist_cleanup()

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timezone
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.db.session import get_db
 from app.models.models import CarbonCredit, User
@@ -46,8 +46,7 @@ class CarbonCreditResponse(BaseModel):
     badge_awarded: Optional[str]
     recorded_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────

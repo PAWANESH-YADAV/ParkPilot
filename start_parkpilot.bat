@@ -26,7 +26,7 @@ if not exist "%VENV_PYTHON%" (
     echo.
     echo Installing dependencies...
     "%VENV_PYTHON%" -m pip install --upgrade pip
-    "%VENV_PYTHON%" -m pip install fastapi==0.115.0 "uvicorn[standard]==0.32.0" sqlalchemy==2.0.36 pydantic==2.10.1 pydantic-settings==2.6.1 "python-jose[cryptography]==3.3.0" "bcrypt==4.1.3" python-multipart==0.0.12 python-dotenv==1.0.1 email-validator httpx==0.27.2 stripe==11.2.0 paho-mqtt==2.1.0
+    "%VENV_PYTHON%" -m pip install --no-cache-dir -r "%BACKEND_DIR%\requirements.txt"
     if errorlevel 1 (
         echo [ERROR] Dependencies install mein problem!
         pause

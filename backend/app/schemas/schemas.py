@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
 from typing import Optional, List
 from app.models.models import (
@@ -23,8 +23,7 @@ class User(UserBase):
     is_active: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Token(BaseModel):
@@ -53,8 +52,7 @@ class Vehicle(VehicleBase):
     user_id: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ParkingLotBase(BaseModel):
@@ -79,8 +77,7 @@ class ParkingLot(ParkingLotBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ParkingLotWithAvailability(ParkingLotBase):
@@ -91,8 +88,7 @@ class ParkingLotWithAvailability(ParkingLotBase):
     available_slots: int = 0
     distance: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ParkingSlotBase(BaseModel):
@@ -112,8 +108,7 @@ class ParkingSlot(ParkingSlotBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ReservationBase(BaseModel):
@@ -149,8 +144,7 @@ class Reservation(ReservationBase):
     is_active: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ReservationDetail(ReservationBase):
@@ -164,8 +158,7 @@ class ReservationDetail(ReservationBase):
     parking_lot_name: Optional[str] = None
     slot_number: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ReservationCreateExtended(BaseModel):
@@ -202,8 +195,7 @@ class ParkingSession(ParkingSessionBase):
     is_active: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TransactionBase(BaseModel):
@@ -222,8 +214,7 @@ class Transaction(TransactionBase):
     stripe_payment_id: Optional[str] = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ANPRRequest(BaseModel):
@@ -274,8 +265,7 @@ class EVSession(EVSessionBase):
     status: EVSessionStatus
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SecurityEventBase(BaseModel):
@@ -296,8 +286,7 @@ class SecurityEvent(SecurityEventBase):
     resolved: bool
     notified: bool
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class QRTicketBase(BaseModel):
@@ -317,8 +306,7 @@ class QRTicket(QRTicketBase):
     expiry_time: Optional[datetime] = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CarbonCreditBase(BaseModel):
@@ -336,8 +324,7 @@ class CarbonCredit(CarbonCreditBase):
     id: int
     recorded_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class VoiceCommandBase(BaseModel):
@@ -356,5 +343,4 @@ class VoiceCommand(VoiceCommandBase):
     success: bool
     recorded_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

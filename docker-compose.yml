@@ -12,14 +12,21 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U parkpilot -d parkpilot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
     build: ./backend
     container_name: parkpilot-backend
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       DATABASE_URL: postgresql://parkpilot:parkpilot123@postgres:5432/parkpilot
+      AI_SERVICE_URL: http://ai-service:8001
     ports:
       - "8000:8000"
 
@@ -30,7 +37,10 @@ services:
       - "8001:8001"
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
     container_name: parkpilot-frontend
     ports:
       - "3000:3000"
