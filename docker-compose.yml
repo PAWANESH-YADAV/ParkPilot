@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: parkpilot-db
+    environment:
+      POSTGRES_USER: parkpilot
+      POSTGRES_PASSWORD: parkpilot123
+      POSTGRES_DB: parkpilot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: parkpilot-backend
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://parkpilot:parkpilot123@postgres:5432/parkpilot
+    ports:
+      - "8000:8000"
+
+  ai-service:
+    build: ./ai-service
+    container_name: parkpilot-ai
+    ports:
+      - "8001:8001"
+
+  frontend:
+    build: ./frontend
+    container_name: parkpilot-frontend
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
