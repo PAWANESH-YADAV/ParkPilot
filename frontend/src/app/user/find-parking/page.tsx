@@ -91,6 +91,7 @@ export default function FindParking() {
   const [sortBy, setSortBy] = useState('distance');
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState('all');
   const [favoriteLots, setFavoriteLots] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [selectedLot, setSelectedLot] = useState<ParkingLot | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [step, setStep] = useState<BookingStep>('details');
@@ -488,6 +489,7 @@ export default function FindParking() {
 
   const filteredAndSorted = useMemo(() => {
     let lots = parkingLots.filter((lot) => {
+      if (showFavoritesOnly && !favoriteLots.includes(lot.id)) return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
         if (
@@ -512,7 +514,7 @@ export default function FindParking() {
       return parseFloat(a.distance) - parseFloat(b.distance);
     });
     return lots;
-  }, [parkingLots, searchQuery, vehicleTypeFilter, sortBy]);
+  }, [parkingLots, searchQuery, vehicleTypeFilter, sortBy, showFavoritesOnly, favoriteLots]);
 
   const stepNumber: Record<BookingStep, number> = {
     details: 1,
@@ -529,10 +531,58 @@ export default function FindParking() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Find Parking</h1>
-        <p className="text-slate-400">Search and book parking spots near you</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">Find Parking</h1>
+          <p className="text-slate-400">Search and book parking spots near you</p>
+        </div>
+        <Button
+          variant={showFavoritesOnly ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setShowFavoritesOnly((v) => !v)}
+          className={cn(
+            'h-12 w-12 rounded-full flex-shrink-0 relative transition-all p-0',
+            showFavoritesOnly
+              ? 'bg-red-600 hover:bg-red-700 text-white border-red-500 shadow-lg shadow-red-500/20'
+              : 'border-slate-600 text-slate-300 hover:border-slate-500 hover:bg-slate-800'
+          )}
+          title={
+            showFavoritesOnly
+              ? 'Show all parking lots'
+              : 'Show only favorites'
+          }
+        >
+          <Heart
+            className="h-5 w-5"
+            fill={showFavoritesOnly ? 'currentColor' : 'none'}
+          />
+          {favoriteLots.length > 0 && (
+            <span
+              className={cn(
+                'absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full text-[10px] font-bold flex items-center justify-center border-2 border-slate-900',
+                showFavoritesOnly
+                  ? 'bg-white text-red-600'
+                  : 'bg-red-500 text-white'
+              )}
+            >
+              {favoriteLots.length}
+            </span>
+          )}
+        </Button>
       </div>
+      {showFavoritesOnly && (
+        <div className="px-4 py-2.5 rounded-lg border border-red-500/30 bg-red-500/10 text-sm text-red-300 inline-flex items-center gap-2">
+          <Heart className="h-4 w-4" fill="currentColor" />
+          Showing <strong>{filteredAndSorted.length}</strong> favorite
+          {filteredAndSorted.length === 1 ? '' : 's'}
+          <button
+            onClick={() => setShowFavoritesOnly(false)}
+            className="ml-auto text-xs text-red-300 hover:text-white underline underline-offset-2"
+          >
+            Clear filter
+          </button>
+        </div>
+      )}
 
       <Card className="bg-slate-800 border-slate-700">
         <CardContent className="p-6 space-y-4">

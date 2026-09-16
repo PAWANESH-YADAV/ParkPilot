@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -22,12 +22,13 @@ import {
   BatteryCharging,
   Leaf,
   Video,
-  QrCode,
   TrendingUp,
   Mic,
   ChevronDown,
   ChevronRight,
+  ChevronUp,
   SlidersHorizontal,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
@@ -58,6 +59,9 @@ export default function DashboardLayout({
   const [groupsOpen, setGroupsOpen] = useState<Record<string, boolean>>({
     "System Configuration": true,
   });
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileTriggerRef = useRef<HTMLButtonElement>(null);
+  const profilePopupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isLoading) {
@@ -125,12 +129,6 @@ export default function DashboardLayout({
       icon: <BarChart3 className="h-5 w-5" />,
     },
     {
-      kind: "link",
-      name: "Notification Management",
-      href: "/dashboard/notifications",
-      icon: <Bell className="h-5 w-5" />,
-    },
-    {
       kind: "group",
       name: "System Configuration",
       icon: <Settings className="h-5 w-5" />,
@@ -156,22 +154,11 @@ export default function DashboardLayout({
           icon: <Video className="h-4 w-4" />,
         },
         {
-          name: "5. QR Code System",
-          href: "/dashboard/qr-system",
-          icon: <QrCode className="h-4 w-4" />,
-        },
-        {
-          name: "6. Dynamic Pricing",
+          name: "5. Dynamic Pricing",
           href: "/dashboard/dynamic-pricing",
           icon: <TrendingUp className="h-4 w-4" />,
         },
       ],
-    },
-    {
-      kind: "link",
-      name: "General Settings",
-      href: "/dashboard/config",
-      icon: <SlidersHorizontal className="h-5 w-5" />,
     },
     {
       kind: "link",
@@ -232,16 +219,16 @@ export default function DashboardLayout({
           fixed lg:static inset-y-0 left-0 z-50
           bg-slate-900 border-r border-slate-800
           transition-all duration-300 ease-in-out
-          w-72
+          w-72 flex flex-col
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-64'}
         `}>
-          <div className="p-6 hidden lg:flex">
+          <div className="p-6 hidden lg:flex flex-shrink-0">
             <Link href="/" className="flex items-center gap-3">
               <Car className="h-8 w-8 text-blue-500" />
               <span className="text-xl font-bold text-white">ParkPilot</span>
             </Link>
           </div>
-          <nav className="px-4 py-2 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
+          <nav className="px-4 py-2 space-y-1 flex-1 overflow-y-auto" style={{ paddingBottom: '112px' }}>
             {navItems.map((item) => {
               if (item.kind === "link") {
                 const active = pathname === item.href;
@@ -351,19 +338,98 @@ export default function DashboardLayout({
               );
             })}
           </nav>
-          <div className="p-4 border-t border-slate-800 mt-auto">
-            <Button
-              variant="ghost"
-              onClick={() => logout()}
-              className="w-full min-h-[44px] h-[44px] flex flex-row items-center justify-start gap-3 px-3 py-0 whitespace-nowrap overflow-hidden text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg"
-            >
-              <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
-                <LogOut className="h-5 w-5" />
-              </span>
-              <span className="text-sm font-medium truncate flex-1 min-w-0 text-left">
-                Logout
-              </span>
-            </Button>
+          <div className="border-t border-slate-800 w-full bg-slate-900 absolute bottom-0 left-0 right-0 z-10">
+            <div className="p-4 space-y-2 relative">
+              <button
+                type="button"
+                ref={profileTriggerRef as React.RefObject<HTMLButtonElement>}
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                <div className="h-12 w-12 rounded-full bg-slate-700 flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
+                  {getInitials()}
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-semibold text-white truncate">{user.firstName} {user.lastName}</p>
+                  <p className="text-xs text-slate-400 truncate">
+                    {user.isAdmin ? "Master Admin" : "User"}
+                  </p>
+                </div>
+                <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-slate-400">
+                  {profileOpen ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronUp className="h-4 w-4" />
+                  )}
+                </span>
+              </button>
+
+              <div className="absolute left-0 right-0 bottom-full mb-2">
+                {profileOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-30 bg-transparent"
+                      onClick={() => setProfileOpen(false)}
+                    />
+                    <div
+                      ref={profilePopupRef as React.RefObject<HTMLDivElement>}
+                      className="relative z-40"
+                    >
+                      <div className="bg-slate-800/95 backdrop-blur-sm rounded-2xl border border-slate-700 shadow-2xl overflow-hidden">
+                        <div className="p-1">
+                          <Link
+                            href="/dashboard/config"
+                            onClick={() => { setSidebarOpen(false); setProfileOpen(false); }}
+                            className="block w-full"
+                          >
+                            <div
+                              className="w-full min-h-[44px] h-[44px] flex flex-row items-center justify-start gap-3 px-3 py-0 text-slate-200 hover:text-white hover:bg-slate-700/60 rounded-xl transition-colors"
+                            >
+                              <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-slate-400">
+                                <User className="h-5 w-5" />
+                              </span>
+                              <span className="text-sm font-semibold truncate flex-1 min-w-0 text-left">
+                                Profile
+                              </span>
+                            </div>
+                          </Link>
+                          <Link
+                            href="/dashboard/settings"
+                            onClick={() => { setSidebarOpen(false); setProfileOpen(false); }}
+                            className="block w-full"
+                          >
+                            <div
+                              className="w-full min-h-[44px] h-[44px] flex flex-row items-center justify-start gap-3 px-3 py-0 text-slate-200 hover:text-white hover:bg-slate-700/60 rounded-xl transition-colors"
+                            >
+                              <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-slate-400">
+                                <Settings className="h-5 w-5" />
+                              </span>
+                              <span className="text-sm font-semibold truncate flex-1 min-w-0 text-left">
+                                Settings
+                              </span>
+                            </div>
+                          </Link>
+                        </div>
+                        <div className="border-t border-slate-700 p-1">
+                          <button
+                            type="button"
+                            onClick={() => { setProfileOpen(false); logout(); }}
+                            className="w-full min-h-[44px] h-[44px] flex flex-row items-center justify-start gap-3 px-3 py-0 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-colors"
+                          >
+                            <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+                              <LogOut className="h-5 w-5" />
+                            </span>
+                            <span className="text-sm font-semibold truncate flex-1 min-w-0 text-left">
+                              Sign out
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </aside>
 
@@ -375,14 +441,13 @@ export default function DashboardLayout({
                 <Menu className="h-5 w-5" />
               </Button>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-white">{user.firstName} {user.lastName}</p>
-                <p className="text-xs text-slate-500">Administrator</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
-                {getInitials()}
-              </div>
+            <div className="flex items-center gap-3">
+              <Link href="/dashboard/notifications" className="relative">
+                <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-slate-800">
+                  <Bell className="h-5 w-5" />
+                </Button>
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+              </Link>
             </div>
           </header>
 

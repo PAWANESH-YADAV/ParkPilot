@@ -1,7 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Car, MapPin, DollarSign, TrendingUp, Users, Camera, Zap } from "lucide-react";
+import { Car, MapPin, DollarSign, TrendingUp, Users, Camera, Zap, QrCode, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 
@@ -26,6 +27,7 @@ const revenueData = [
 ];
 
 export default function Dashboard() {
+  const router = useRouter();
   const stats = [
     {
       title: "Total Slots",
@@ -244,6 +246,80 @@ export default function Dashboard() {
           </Card>
         </motion.div>
       </div>
+
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+      >
+        <h2 className="text-xl font-bold text-white mb-4">Quick Actions</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card
+            className="bg-slate-800 border-slate-700 cursor-pointer hover:border-green-500 transition-all hover:shadow-lg hover:shadow-green-500/10"
+            onClick={() => router.push("/dashboard/qr-system")}
+          >
+            <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+              <div className="p-3 bg-green-500/10 rounded-lg">
+                <QrCode className="h-8 w-8 text-green-500" />
+              </div>
+              <div>
+                <p className="text-white font-semibold">QR Code System</p>
+                <p className="text-slate-400 text-sm">Generate & scan tickets</p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-slate-500" />
+            </CardContent>
+          </Card>
+
+          <Card
+            className="bg-slate-800 border-slate-700 cursor-pointer hover:border-blue-500 transition-all hover:shadow-lg hover:shadow-blue-500/10"
+            onClick={() => router.push("/dashboard/parking-lots")}
+          >
+            <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+              <div className="p-3 bg-blue-500/10 rounded-lg">
+                <MapPin className="h-8 w-8 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-white font-semibold">Parking Lots</p>
+                <p className="text-slate-400 text-sm">Manage locations</p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-slate-500" />
+            </CardContent>
+          </Card>
+
+          <Card
+            className="bg-slate-800 border-slate-700 cursor-pointer hover:border-cyan-500 transition-all hover:shadow-lg hover:shadow-cyan-500/10"
+            onClick={() => router.push("/dashboard/bookings")}
+          >
+            <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+              <div className="p-3 bg-cyan-500/10 rounded-lg">
+                <Car className="h-8 w-8 text-cyan-500" />
+              </div>
+              <div>
+                <p className="text-white font-semibold">Bookings</p>
+                <p className="text-slate-400 text-sm">View all reservations</p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-slate-500" />
+            </CardContent>
+          </Card>
+
+          <Card
+            className="bg-slate-800 border-slate-700 cursor-pointer hover:border-yellow-500 transition-all hover:shadow-lg hover:shadow-yellow-500/10"
+            onClick={() => router.push("/dashboard/billing")}
+          >
+            <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+              <div className="p-3 bg-yellow-500/10 rounded-lg">
+                <DollarSign className="h-8 w-8 text-yellow-500" />
+              </div>
+              <div>
+                <p className="text-white font-semibold">Billing</p>
+                <p className="text-slate-400 text-sm">Payments & invoices</p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-slate-500" />
+            </CardContent>
+          </Card>
+        </div>
+      </motion.div>
     </div>
   );
 }
