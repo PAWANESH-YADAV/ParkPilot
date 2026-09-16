@@ -17,9 +17,9 @@ export function Button({
     "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed";
   
   const variantClasses = {
-    default: "bg-blue-600 hover:bg-blue-700 text-white",
-    outline: "border border-slate-700 bg-transparent hover:bg-slate-800 text-white",
-    ghost: "bg-transparent hover:bg-slate-800 text-slate-300 hover:text-white",
+    default: "bg-blue-600 hover:bg-blue-700 text-white shadow-xs",
+    outline: "border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-white",
+    ghost: "bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white",
     destructive: "bg-red-600 hover:bg-red-700 text-white",
   };
   

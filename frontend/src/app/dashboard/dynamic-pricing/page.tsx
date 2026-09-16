@@ -46,14 +46,14 @@ export default function DynamicPricingPage() {
     setCalculating(false);
   };
 
-  const surgeColor = (s: number) => s > 1.3 ? "text-red-400" : s > 1.0 ? "text-yellow-400" : "text-green-400";
+  const surgeColor = (s: number) => s > 1.3 ? "text-red-500 dark:text-red-400" : s > 1.0 ? "text-amber-600 dark:text-yellow-400" : "text-emerald-600 dark:text-green-400";
   const surgeLabel = (s: number) => s > 1.3 ? "🔴 Peak Surge" : s > 1.0 ? "🟡 Moderate" : "🟢 Discount";
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Dynamic Pricing Engine</h1>
-        <p className="text-slate-400">Module 12 — AI-driven surge pricing based on occupancy, weather, and events</p>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Dynamic Pricing Engine</h1>
+        <p className="text-slate-500 dark:text-slate-400">Module 12 — AI-driven surge pricing based on occupancy, weather, and events</p>
       </div>
 
       {/* Lot Cards */}
@@ -61,31 +61,35 @@ export default function DynamicPricingPage() {
         {lots.map((lot, i) => (
           <motion.div key={lot.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
             <Card
-              className={`border cursor-pointer transition-all ${selectedLot.id === lot.id ? "bg-slate-700 border-blue-500" : "bg-slate-800 border-slate-700 hover:border-slate-500"}`}
+              className={`border cursor-pointer transition-all ${
+                selectedLot.id === lot.id
+                  ? "bg-blue-50/50 dark:bg-slate-800 border-blue-500 shadow-md"
+                  : "bg-white dark:bg-slate-850 dark:bg-slate-800/90 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+              }`}
               onClick={() => { setSelectedLot(lot); setOccupancy(lot.occupancy); setEventFactor(lot.event); setCalculatedRate(null); }}
             >
               <CardContent className="pt-5">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <div className="text-white font-bold text-lg">{lot.name}</div>
-                    <div className="text-slate-400 text-sm">Base: ₹{lot.base}/hr</div>
+                    <div className="text-slate-900 dark:text-white font-bold text-lg">{lot.name}</div>
+                    <div className="text-slate-500 dark:text-slate-400 text-sm">Base: ₹{lot.base}/hr</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-blue-400">₹{lot.current}</div>
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">₹{lot.current}</div>
                     <div className={`text-sm font-medium ${surgeColor(lot.surge)}`}>{surgeLabel(lot.surge)}</div>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="text-center p-2 bg-slate-900 rounded-lg">
-                    <div className="text-white font-bold">{lot.occupancy}%</div>
+                  <div className="text-center p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="text-slate-900 dark:text-white font-bold">{lot.occupancy}%</div>
                     <div className="text-slate-500 text-xs">Occupancy</div>
                   </div>
-                  <div className="text-center p-2 bg-slate-900 rounded-lg">
-                    <div className="text-white font-bold">{lot.surge}x</div>
+                  <div className="text-center p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="text-slate-900 dark:text-white font-bold">{lot.surge}x</div>
                     <div className="text-slate-500 text-xs">Surge</div>
                   </div>
-                  <div className="text-center p-2 bg-slate-900 rounded-lg">
-                    <div className="text-white font-bold">{lot.event}x</div>
+                  <div className="text-center p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="text-slate-900 dark:text-white font-bold">{lot.event}x</div>
                     <div className="text-slate-500 text-xs">Event</div>
                   </div>
                 </div>
@@ -99,21 +103,21 @@ export default function DynamicPricingPage() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Price History */}
         <div className="lg:col-span-2">
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-white dark:bg-slate-850 dark:bg-slate-800/90 border-slate-200 dark:border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white">24h Price & Occupancy — {selectedLot.name}</CardTitle>
-              <p className="text-sm text-slate-400">Dynamic rate adjustments vs occupancy throughout the day</p>
+              <CardTitle className="text-slate-900 dark:text-white">24h Price & Occupancy — {selectedLot.name}</CardTitle>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Dynamic rate adjustments vs occupancy throughout the day</p>
             </CardHeader>
             <CardContent>
               <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={pricingHistory}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-700" />
                     <XAxis dataKey="time" stroke="#94a3b8" tick={{ fontSize: 11 }} />
                     <YAxis yAxisId="rate" stroke="#94a3b8" tick={{ fontSize: 11 }} domain={[20, 60]} />
                     <YAxis yAxisId="occ" orientation="right" stroke="#94a3b8" tick={{ fontSize: 11 }} domain={[0, 100]} />
-                    <Tooltip contentStyle={{ backgroundColor: "#1e293b", border: "1px solid #334155" }} labelStyle={{ color: "#f1f5f9" }} />
-                    <ReferenceLine yAxisId="rate" y={selectedLot.base} stroke="#475569" strokeDasharray="4 4" label={{ value: "Base", fill: "#64748b", fontSize: 10 }} />
+                    <Tooltip />
+                    <ReferenceLine yAxisId="rate" y={selectedLot.base} stroke="#94a3b8" strokeDasharray="4 4" label={{ value: "Base", fill: "#94a3b8", fontSize: 10 }} />
                     <Line yAxisId="rate" type="monotone" dataKey="rate" stroke="#2563eb" strokeWidth={2.5} dot={{ fill: "#2563eb", r: 3 }} name="Rate (₹)" />
                     <Line yAxisId="occ" type="monotone" dataKey="occupancy" stroke="#f59e0b" strokeWidth={1.5} strokeDasharray="4 4" dot={false} name="Occupancy %" />
                   </LineChart>
@@ -124,42 +128,42 @@ export default function DynamicPricingPage() {
         </div>
 
         {/* Pricing Simulator */}
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className="bg-white dark:bg-slate-850 dark:bg-slate-800/90 border-slate-200 dark:border-slate-700">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2"><Sliders className="h-5 w-5 text-purple-400" />Price Simulator</CardTitle>
+            <CardTitle className="text-slate-900 dark:text-white flex items-center gap-2"><Sliders className="h-5 w-5 text-purple-600 dark:text-purple-400" />Price Simulator</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div>
               <div className="flex justify-between mb-1">
-                <label className="text-slate-400 text-xs">Occupancy</label>
-                <span className="text-white text-xs font-bold">{occupancy}%</span>
+                <label className="text-slate-600 dark:text-slate-400 text-xs">Occupancy</label>
+                <span className="text-slate-900 dark:text-white text-xs font-bold">{occupancy}%</span>
               </div>
-              <input type="range" min={0} max={100} value={occupancy} onChange={(e) => { setOccupancy(+e.target.value); setCalculatedRate(null); }} className="w-full accent-blue-500" />
+              <input type="range" min={0} max={100} value={occupancy} onChange={(e) => { setOccupancy(+e.target.value); setCalculatedRate(null); }} className="w-full accent-blue-600" />
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <label className="text-slate-400 text-xs">Weather Factor</label>
-                <span className="text-white text-xs font-bold">{weatherFactor.toFixed(1)}x</span>
+                <label className="text-slate-600 dark:text-slate-400 text-xs">Weather Factor</label>
+                <span className="text-slate-900 dark:text-white text-xs font-bold">{weatherFactor.toFixed(1)}x</span>
               </div>
-              <input type="range" min={0.8} max={1.5} step={0.1} value={weatherFactor} onChange={(e) => { setWeatherFactor(+e.target.value); setCalculatedRate(null); }} className="w-full accent-blue-500" />
+              <input type="range" min={0.8} max={1.5} step={0.1} value={weatherFactor} onChange={(e) => { setWeatherFactor(+e.target.value); setCalculatedRate(null); }} className="w-full accent-blue-600" />
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <label className="text-slate-400 text-xs">Event Factor</label>
-                <span className="text-white text-xs font-bold">{eventFactor.toFixed(1)}x</span>
+                <label className="text-slate-600 dark:text-slate-400 text-xs">Event Factor</label>
+                <span className="text-slate-900 dark:text-white text-xs font-bold">{eventFactor.toFixed(1)}x</span>
               </div>
-              <input type="range" min={1.0} max={2.5} step={0.1} value={eventFactor} onChange={(e) => { setEventFactor(+e.target.value); setCalculatedRate(null); }} className="w-full accent-blue-500" />
+              <input type="range" min={1.0} max={2.5} step={0.1} value={eventFactor} onChange={(e) => { setEventFactor(+e.target.value); setCalculatedRate(null); }} className="w-full accent-blue-600" />
             </div>
 
-            <button onClick={handleCalculate} disabled={calculating} className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            <button onClick={handleCalculate} disabled={calculating} className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs">
               <RefreshCw className={`h-4 w-4 ${calculating ? "animate-spin" : ""}`} />
               {calculating ? "Calculating..." : "Calculate Price"}
             </button>
 
             {calculatedRate !== null && (
-              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="p-4 bg-slate-900 rounded-xl border border-slate-700 text-center">
-                <div className="text-slate-400 text-xs mb-1">Recommended Rate</div>
-                <div className="text-3xl font-bold text-blue-400">₹{calculatedRate}/hr</div>
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-center">
+                <div className="text-slate-500 dark:text-slate-400 text-xs mb-1">Recommended Rate</div>
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">₹{calculatedRate}/hr</div>
                 <div className={`text-sm font-medium mt-1 ${surgeColor(getSurge(occupancy, weatherFactor, eventFactor))}`}>
                   {surgeLabel(getSurge(occupancy, weatherFactor, eventFactor))} · {getSurge(occupancy, weatherFactor, eventFactor).toFixed(2)}x
                 </div>
