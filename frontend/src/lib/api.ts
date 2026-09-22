@@ -121,6 +121,20 @@ export const authApi = {
       .post<LogoutResponse>('/auth/logout')
       .then((r) => r.data)
       .catch(() => ({ success: true, message: 'Local cleanup completed' })),
+  getUsers: () => api.get<BackendUser[]>('/auth/users').then((r) => r.data),
+  createUser: (payload: {
+    email: string;
+    full_name: string;
+    password: string;
+    role?: string;
+    is_active?: boolean;
+  }) => api.post<BackendUser>('/auth/users', payload).then((r) => r.data),
+  updateUser: (
+    id: number,
+    payload: Partial<{ full_name: string; email: string; role: string; is_active: boolean }>
+  ) => api.patch<BackendUser>(`/auth/users/${id}`, payload).then((r) => r.data),
+  deleteUser: (id: number) =>
+    api.delete<{ success: boolean; message: string }>(`/auth/users/${id}`).then((r) => r.data),
 };
 
 export interface ParkingLot {

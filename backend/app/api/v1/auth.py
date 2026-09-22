@@ -3,10 +3,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta, datetime, timezone
 from pydantic import BaseModel
-from typing import Set, Tuple, Annotated, Optional
+from typing import Set, Tuple, Annotated, Optional, List
 
 from app.db.session import get_db
-from app.models.models import User
+from app.models.models import User, UserRole
 from app.schemas.schemas import UserCreate, User as UserSchema, Token
 from app.core.security import (
     verify_password,
@@ -120,3 +120,72 @@ def logout(
         "message": "Logged out successfully",
         "user": current_user.email,
     }
+
+
+class AdminUserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+class AdminUserCreate(BaseModel):
+    email: str
+    full_name: str
+    password: str
+    role: Optional[str] = "driver"
+    is_active: Optional[bool] = True
+
+
+@router.get("/users", response_model=List[UserSchema])
+def list_users(db: Session = Depends(get_db)):
+    return db.query(User).order_by(User.id.desc()).all()
+
+
+@router.post("/users", response_model=UserSchema)
+def create_user_by_admin(payload: AdminUserCreate, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.email == payload.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    role_val = UserRole.ADMIN if payload.role == "admin" else UserRole.DRIVER
+    new_user = User(
+        email=payload.email,
+        full_name=payload.full_name,
+        hashed_password=get_password_hash(payload.password),
+        role=role_val,
+        is_active=payload.is_active if payload.is_active is not None else True,
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+
+@router.patch("/users/{user_id}", response_model=UserSchema)
+def update_user_by_admin(user_id: int, payload: AdminUserUpdate, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if payload.full_name is not None:
+        user.full_name = payload.full_name
+    if payload.email is not None:
+        user.email = payload.email
+    if payload.role is not None:
+        user.role = UserRole.ADMIN if payload.role == "admin" else UserRole.DRIVER
+    if payload.is_active is not None:
+        user.is_active = payload.is_active
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@router.delete("/users/{user_id}")
+def delete_user_by_admin(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(user)
+    db.commit()
+    return {"success": True, "message": "User deleted successfully"}
+

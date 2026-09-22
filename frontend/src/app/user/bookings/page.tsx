@@ -9,14 +9,11 @@ import {
   Clock,
   MapPin,
   Car,
-  QrCode,
   X,
   Plus,
   ChevronDown,
   ChevronUp,
   Clock3,
-  CheckCircle2,
-  Loader2,
   AlertTriangle,
   CreditCard,
   Tag,
@@ -102,7 +99,7 @@ export default function BookingsPage() {
   >('all');
   const [expandedBooking, setExpandedBooking] = useState<string | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [showQrModal, setShowQrModal] = useState<Booking | null>(null);
+
   const [showCancelModal, setShowCancelModal] = useState<Booking | null>(null);
   const [showExtendModal, setShowExtendModal] = useState<Booking | null>(null);
   const [extendHours, setExtendHours] = useState(1);
@@ -523,59 +520,34 @@ export default function BookingsPage() {
                   </div>
 
                   <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-700">
-                    {(booking.status === 'active' ||
-                      booking.status === 'confirmed' ||
-                      booking.status === 'pending') && (
+                    {booking.status === 'active' && (
                       <>
+                        <Button
+                          className="bg-yellow-600 hover:bg-yellow-700"
+                          onClick={() => {
+                            setShowExtendModal(booking);
+                            setExtendHours(1);
+                          }}
+                          disabled={isProcessing}
+                        >
+                          <Clock3 className="h-4 w-4 mr-2" />
+                          Extend
+                        </Button>
                         <Button
                           variant="outline"
                           className="border-slate-600 text-slate-300 hover:text-white hover:bg-slate-700"
-                          onClick={() => setShowQrModal(booking)}
+                          onClick={() => handleComplete(booking)}
+                          disabled={isProcessing}
                         >
-                          <QrCode className="h-4 w-4 mr-2" />
-                          View QR
+                          Complete
                         </Button>
-                        {(booking.status === 'confirmed' ||
-                          booking.status === 'pending') && (
-                          <Button
-                            className="bg-green-600 hover:bg-green-700"
-                            onClick={() => handleActivate(booking)}
-                            disabled={isProcessing}
-                          >
-                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                            Start Parking
-                          </Button>
-                        )}
-                        {booking.status === 'active' && (
-                          <>
-                            <Button
-                              className="bg-yellow-600 hover:bg-yellow-700"
-                              onClick={() => {
-                                setShowExtendModal(booking);
-                                setExtendHours(1);
-                              }}
-                              disabled={isProcessing}
-                            >
-                              <Clock3 className="h-4 w-4 mr-2" />
-                              Extend
-                            </Button>
-                            <Button
-                              variant="outline"
-                              className="border-slate-600 text-slate-300 hover:text-white hover:bg-slate-700"
-                              onClick={() => handleComplete(booking)}
-                              disabled={isProcessing}
-                            >
-                              Complete
-                            </Button>
-                          </>
-                        )}
                       </>
                     )}
                     {(booking.status === 'confirmed' ||
                       booking.status === 'pending') && (
                       <Button
                         variant="outline"
-                        className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 sm:ml-auto"
+                        className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300"
                         onClick={() => setShowCancelModal(booking)}
                         disabled={isProcessing}
                       >
@@ -591,7 +563,7 @@ export default function BookingsPage() {
                           expandedBooking === booking.id ? null : booking.id
                         )
                       }
-                      className="text-slate-400 hover:text-white sm:ml-auto"
+                      className="text-slate-400 hover:text-white ml-auto"
                     >
                       {expandedBooking === booking.id ? (
                         <ChevronUp className="h-4 w-4" />
@@ -658,98 +630,6 @@ export default function BookingsPage() {
         )}
       </div>
 
-      <AnimatePresence>
-        {showQrModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            onClick={() => setShowQrModal(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 20, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.95, y: 20, opacity: 0 }}
-              className="w-full max-w-sm"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Card className="bg-slate-800 border-slate-700">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-xl text-white">QR Entry Code</CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowQrModal(null)}
-                    className="text-slate-400 hover:text-white"
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </CardHeader>
-                <CardContent className="pt-4 text-center space-y-4">
-                  <div className="bg-white p-5 rounded-xl inline-block shadow-2xl">
-                    <div className="w-48 h-48 relative">
-                      <svg viewBox="0 0 100 100" className="w-full h-full">
-                        {Array.from({ length: 12 }).map((_, i) =>
-                          Array.from({ length: 12 }).map((_, j) => {
-                            const s = (i * 31 + j * 17 + showQrModal.id.length * 7) % 2;
-                            return s === 0 ? null : (
-                              <rect
-                                key={`${i}-${j}`}
-                                x={8 + j * 7}
-                                y={8 + i * 7}
-                                width="5.5"
-                                height="5.5"
-                                fill="#0f172a"
-                                rx="0.5"
-                              />
-                            );
-                          })
-                        )}
-                        <rect x="5" y="5" width="18" height="18" fill="none" stroke="#0f172a" strokeWidth="3" rx="2" />
-                        <rect x="9" y="9" width="10" height="10" fill="#2563eb" rx="1" />
-                        <rect x="77" y="5" width="18" height="18" fill="none" stroke="#0f172a" strokeWidth="3" rx="2" />
-                        <rect x="81" y="9" width="10" height="10" fill="#2563eb" rx="1" />
-                        <rect x="5" y="77" width="18" height="18" fill="none" stroke="#0f172a" strokeWidth="3" rx="2" />
-                        <rect x="9" y="81" width="10" height="10" fill="#2563eb" rx="1" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="space-y-1.5 text-left bg-slate-700/40 rounded-lg p-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Booking ID</span>
-                      <span className="text-white font-mono text-xs">
-                        {showQrModal.id}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Lot</span>
-                      <span className="text-white font-medium">
-                        {showQrModal.parkingLotName}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Slot</span>
-                      <span className="text-white font-medium">
-                        {showQrModal.slotNumber}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Valid</span>
-                      <span className="text-white text-xs">
-                        {showQrModal.date} {formatTime(showQrModal.startTime)}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-slate-500 text-xs">
-                    Scan this QR at the entry gate to access your reserved slot.
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <AnimatePresence>
         {showCancelModal && (

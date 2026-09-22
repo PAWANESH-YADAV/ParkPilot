@@ -120,10 +120,9 @@ export default function UserLayout({
           <nav className="px-4 py-2 space-y-1 flex-1 overflow-y-auto" style={{ paddingBottom: '112px' }}>
             {navItems.map((item) => (
               <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}>
-                <Button
-                  variant="ghost"
+                <div
                   className={`
-                    w-full justify-start gap-3 py-2.5 h-auto rounded-xl transition-all duration-150
+                    w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-150 cursor-pointer
                     ${
                       pathname === item.href
                         ? 'bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-xs'
@@ -131,9 +130,9 @@ export default function UserLayout({
                     }
                   `}
                 >
-                  <span className="flex-shrink-0">{item.icon}</span>
+                  <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center">{item.icon}</span>
                   <span className="text-sm font-medium truncate">{item.name}</span>
-                </Button>
+                </div>
               </Link>
             ))}
           </nav>
